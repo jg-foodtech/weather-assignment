@@ -1,0 +1,1040 @@
+apt-get install putty
+apt-get install openssh-server
+ip a
+hostname -I
+vim /etc/ssh/sshd_config
+systemctl restart sshd
+systemctl restart sshd.service
+systemctl restart ssh
+apt-get install ttf-mscorefonts-installer
+fc-cache -fv
+ls
+sed -i 's/\\040/ /g' ~/.mysql_history 
+vim ~/.mysql_history 
+ls
+cd root/
+ls
+cd yh/
+ls
+mv p.py ../weather-assignment/
+cd ..
+ls
+cd weather-assignment/
+ls
+python3 p.py 
+ls
+vim output.txt 
+python3 p.py 
+vim p.py 
+ls
+python3 p.py 
+vim output.txt 
+vim p.py
+python3 p.py 
+vim p.py
+vim output.txt 
+history
+sed -i 's/\\040/ /g' ~/.mysql_history
+cp ~/.mysql_history mysql_history
+ls
+cp ~/.bash_history bash_history
+ls
+vim mysql_history 
+ls
+vim bash_history 
+ls
+cd /var/lib/mysql/
+ls
+ls -al
+cd -
+mkdr dbdata
+mkdir dbdata
+cd dbdata/
+ls
+cd ..
+ls
+cd- 
+ls
+cd -
+ls
+cd my
+ls
+cd /var/lib/mysql/mysql/
+ls
+ls -al
+cd -
+ls
+cd ..
+ls
+rm -rf dbdata/
+ls
+mv p.py test.py
+ls
+git add .
+ls
+git remote add origin https://github.com/jg-foodtech/weather-assignment.git
+git push -u origin main
+ssh-keygen -t ed25519 -C "jg.foodtech@gmail.com"
+cat ~/.ssh/id_ed25519
+ssh-keygen -t rsa -b 4096 -C "jg.foodtech@gmail.com"
+cat ~/.ssh/id_rsa
+vim ~/.ssh/id_rsa
+ls
+git push -u origin main
+git remote
+git remote origin
+git remote get-url origin
+git status
+git commit
+ls
+git status
+git remote get-url origin
+git push
+git push -u origin main
+git remote -v
+git fetch
+git remote set-url
+git remote set-url --add origin https://github.com/jg-foodtech/weather-assignment.git
+git push origin
+git push -u origin main
+ssh-keygen -p -f ~/.ssh/id_ed25519
+vim ~/.bashrc 
+source ~/.bashrc 
+git push -u origin main
+cp ~/.ssh/* /root/mnt/lls/
+git push -u origin main
+git remote add origin git@github.com:jg-foodtech/weather-assignment.git
+git remote origin del
+git remote remove origin
+git remote add origin git@github.com:jg-foodtech/weather-assignment.git
+git push -u origin main
+ls
+vim /etc/fstab 
+ls
+exit
+ls
+exit
+ls
+cd /usr/share/vim/vim91/
+ls
+cd colors/
+ls
+vim ~/.vimrc
+exit
+ls
+apt search solarized
+apt-get install vim-solarized
+exit
+apt search dracula
+apt search onedar
+apt search onedark
+Plug
+apt-get install vim-plug
+apt search vim-plu
+apt search vim-plug
+exit
+cd mnt/
+ls
+cd weather-assignment/
+ls
+cd frontend/
+ls
+vim index.html 
+cp index.html /home/jg/바탕화면/index.html 
+vim ~/.bashrc 
+source ~/.bashrc 
+vim ~/.bashrc 
+source ~/.bashrc 
+cphtml 
+ls
+exit
+ls
+vim ~/.bashrc 
+source ~/.bashrc 
+gof 
+ls
+vim ~/.bashrc 
+source ~/.bashrc 
+gof 
+ls
+gob 
+ls
+vim output.txt 
+vim test.py 
+ls
+exit
+ls
+exit
+vim ~/.vimrc 
+source ~/.vimrc && vim ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc && vim ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc && vim ~/.vimrc
+vim ~/.vimrc 
+ls
+cd root/
+ls
+cd yh/
+ls
+vim p.py 
+ls
+cd ~
+ls
+cd root/
+ls
+cd yh/
+ls
+cd ../..
+ls
+cd root/
+ls
+rm r-f yh/
+rm -rf yh/
+ls
+cd ..
+ls
+cd root/
+ls
+cd ..
+cd mnt/
+l
+s
+cd weather-assignment/
+ls
+ln /home/jg/바탕화면/react-app/src/App.js frontend/app.js
+ls
+cd frontend/
+ls
+cp react.js /home/jg/바탕화면/react-app/src/App.js
+ls
+cp index.html /home/jg/react-app/public/
+ls
+vim ~/.bashrc 
+source ~/.bashrc 
+cpreact 
+ls
+cp -r /home/jg/react-app/ .
+ls
+vim react-app/src/App.js 
+ls
+gob 
+ls
+vim test.py 
+ls
+cd ..
+ls
+git status
+git config --global --add safe.difectory /root/mnt/weather-assignment
+git status
+git config --global --add safe.directory /root/mnt/weather-assignment
+git status
+git add .
+git status
+git add .
+git status
+git log
+git commit
+git config --global core.editor
+git config --global core.editor "vim"
+git commit
+ls
+git log
+git rebase -i 8b7fce3dd7c07eb3022b5db38b26f413020b89f2
+git commit --amend
+ls
+git log
+git branch
+git rebase --continue
+git status
+git rebase --abort
+git status
+git log
+ls
+git rebase --abort
+git status
+git add backend
+git add frontend
+git status
+git branch
+git add backend/
+ls
+cd backend/
+ls
+rm -rf app.log 
+cd ..
+git status
+git add backend/
+git status
+vim README.md 
+vim output.txt 
+git log
+git status
+git add .
+git log
+qgit status
+git rebase --abort
+git status
+git branch
+git log
+git rebase -i 8b7fce3dd7c07eb3022b5db38b26f413020b89f2
+git log
+qgit status
+git status
+git rebase --continue
+git status
+git add .
+git status
+git rebase --continue
+git status
+git rebase --abort
+git status
+git log
+ls
+vim ~/.bashrc 
+ls
+cpreact 
+ls
+cd frontend/
+ls
+cd react-app/
+ls
+cd src/
+ls
+vim App.js 
+vim ~/.bashrc 
+source ~/.bashrc 
+cpreact 
+ls
+vim combobox.js
+vim ~/.bashrc 
+cpreact 
+vim ~/.bashrc 
+source ~/.bashrc 
+vim ~/.bashrc 
+source ~/.bashrc 
+cpreact 
+ls
+vim combobox.js 
+mv combobox.js Combobox.js
+ls
+cpreact 
+ls
+vim utils.js
+ls
+source ~/.vimrc
+ls
+source ~/.bashrc 
+cpreact 
+vim distinct.js 
+cpreact 
+vim distinct.js 
+cpreact 
+vim distinct.js 
+cpreact 
+vim distinct.js 
+vim utils.js 
+ls
+vim distinct.js 
+ls
+vim utils.js 
+cpreact 
+vim utils.js 
+vim distinct.
+ls
+rm -rf distinct.txt 
+vim distinct.js 
+cpreact 
+vim distinct.js 
+cpreact 
+ls
+vim combobox.js 
+cpreact 
+vim combobox.js 
+cpreact 
+vim combobox.js 
+cpreact 
+ls
+vim entry.js
+ls
+cd ..
+ls
+cd ..
+ls
+cd ..
+ls
+cd backend/
+ls
+vim output.txt 
+cd ..
+ls
+find -name *.csv
+cd ..
+ls
+cp forecast_weather.csv weather-assignment/
+cp historical_weather.csv weather-assignment/
+ls
+cd weather-assignment/
+ls
+mkdir raw
+mv *.csv raw/
+ls
+cd raw/
+ls
+vim historical_weather.csv 
+1
+cpreact 
+ls
+cd ..
+ls
+vim frontend/react-app/src/App.js 
+ls
+git status
+git branch
+git status
+git add raw/
+git add frontend/
+git add backend/
+git status
+git add backend/
+git status
+rm -rf backend/.test.py.swp 
+git add backend/
+git status
+git add frontend/react-app/
+git status
+git add backend
+rm -rf backend/.test.py.swp 
+git add backend
+ls
+git log
+git rebase -i 8b7fce3dd7c07eb3022b5db38b26f413020b89f2
+git status
+git stash
+git rebase -i 8b7fce3dd7c07eb3022b5db38b26f413020b89f2
+ls
+cd history/
+ls
+cd day1/
+ls
+git status
+git diff .
+git status
+cd ..
+ls
+git status
+cd ..
+git status
+ls
+git status
+git rebase --abort
+git status
+git log
+git branch
+git checkout temp
+git checkout 4fd3a00d5eaf5d0858d7b2642c114591097340a6
+git status
+git diff
+git status
+git branch
+ls
+git status
+git add bash_history 
+git add mysql_history 
+git add output.txt 
+git add test.py 
+git add Re
+git add README.md 
+git status
+git commit --amend
+git branch
+git checkout main
+git log
+git branch
+git log
+git status
+git rebase -i 8b7fce3dd7c07eb3022b5db38b26f413020b89f2
+git status
+git add README.md mysql_history output.txt test.py
+vim bash_history 
+git status
+git add bash_history 
+git commit --amend
+git rebase --continue
+git status
+ls
+rm -rf test.py 
+git status
+git add test.py 
+git rebase --continue
+git status
+git log
+vim ~/.bashrc 
+ls
+cd ~/
+ls
+ls -al
+exit
+ls
+cd /home/jg/바탕화면
+ls
+cd react-app/
+ls
+cd ../..
+ls
+cd -
+cd ..
+ls
+mv react-app/ ../
+cd ..
+ls
+cd react-app/
+ls
+cd src/
+ls
+vim App.
+vim ../public/index.html 
+grep -rni "directory listing"
+grep -rni "directory listing for"
+cd ..
+grep -rni "directory listing for"
+grep -rni "logo192"
+cd public/l
+cd public/
+ls
+vim index.html 
+ls
+vim index.html 
+cd ..
+ls
+find -name index.js
+cd src/
+ls
+vim index.js 
+ls
+vim App.js 
+vim index.js 
+ls
+vim index.js 
+find -name favicon.ico
+cd ..
+find -name favicon.ico
+cd public/
+ls
+vim index.html 
+vim ~/.vimrc 
+source ~/.vimrc 
+vim ~/.vimrc 
+ls
+vim index.html 
+ls
+vim index.html 
+ls
+vim ../src/index.
+vim ../src/index.js 
+source ~/.vimrc 
+vim ../src/index.js 
+:q
+ls
+vim index.html 
+ls
+cd ..
+ls
+cd src/
+ls
+vim App.js 
+vim index.js 
+source ~/.vimrc 
+vim index.js 
+ls
+cd ..
+ls
+npm run build
+ls
+cd src/
+ls
+vim App.
+vim App.js 
+npm run build
+ls
+vim App.js 
+ls
+rm -rf combobox.js 
+npm run build
+ls
+vim distinct.js 
+npm run build
+lks
+ls
+vim combobox.js 
+ls
+vim App.js 
+npm run build
+ls
+history
+exit
+ls
+cd /home/ojg
+ls
+cd /home/jg/
+ls
+cd 바탕화면
+ls
+cd react-app/
+ls
+cd src/
+ls
+vim App.
+vim App.js 
+ls
+vim ../public/index.html 
+ls
+npm run build
+npm install axios
+npm start
+ls
+cd ../..
+l
+s
+ls
+cd react-app/
+ls
+cd public/
+ls
+cd ..
+npm start
+exit
+ls
+cd root/
+ls
+cd mnt
+cd ../mnt/weather-assignment/
+ls
+cd history/
+ls
+cd day2/
+ls
+ls
+ls
+history
+exit
+ls
+cd mnt/
+ls
+cd weather-assignment/
+ls
+cd history/
+ls
+exit
+ls
+cd mnt/
+ls
+vim forecast_weather.csv 
+vim histor
+vim history.csv 
+exit
+vim ~/.vimrc 
+apt-get install python3-black
+pip install black
+sudo add-apt-repository ppa:deadsnakes/ppa
+apt-get install python3-black
+apt-get install pipx
+pipx ensurepath
+pipx install black
+vim 
+vim ~/.vimrc 
+ls
+cd root/
+ls
+cd weather-assignment/
+ls
+mkdir frontend
+ls
+cd frontend/
+ls
+cd ../..
+ls
+mv weather-assignment/ ../mnt/
+cd mnt
+ls
+cd. ./mnt
+ls
+cd ..
+ls
+cdm nt
+ls
+cd mnt/
+ls
+cd weather-assignment/
+ls
+cd frontend/
+ls
+vim index.html
+ls
+ls -al
+cd /home/a
+ls
+cd /home/
+ls
+cd jg/
+ls
+ln -s /root/mnt/weather-assignment/ 바탕화면/weather
+cd /root/mnt/
+ls
+chown a:a weather-assignment/
+chown jg:jg weather-assignment/
+ls
+cd weather-assignment/
+ls
+cd frontend/
+ls
+cd ~
+ls
+cd /home/jg/
+history
+ln -s /root/mnt/weather-assignment/frontend/index.html 바탕화면/index.html
+ls
+cd /root/mnt/weather-assignment/frontend/
+ls
+ls -al
+chmod 777 index.html 
+cd- 
+ls
+vim index.html 
+ls
+vim ine
+vim index.html 
+cd. .
+cd ..
+ls
+chown jg:jg backend/
+chown jg:jg frontend/
+cd frontend/
+ls
+chown jg:jg index.html 
+cd ..
+l
+sls -al
+ls -al
+cd ..
+ls -al
+cd. .
+ls -al
+cd ..
+ls -al
+cd mnt/
+ls
+cd weather-assignment/
+ls
+cd frontend/
+ls
+cp index.html /home/jg/바탕화면
+cp index.html /home/jg/바탕화면/index.html2
+cd /home/jg/바탕화면/
+ls
+rm -rf index.html
+ls
+rm -rf weather
+ls
+mv index.html2 index.html
+ls
+ls -al
+chown jg:jg index.html 
+ls\
+source ~/.bashrc 
+cphtml 
+gof 
+ls
+vim react.js
+vim ~/.bashrc 
+source ~/.bashrc 
+cphtml 
+vim ~/.bashrc 
+source ~/.bashrc 
+cphtml 
+vim ~/.bashrc 
+source ~/.bashrc 
+cphtml 
+vim ~/.bashrc 
+source ~/.bashrc 
+cphtml 
+vim ~/.bashrc 
+source ~/.bashrc 
+vim ~/.bashrc 
+cphtml 
+apt-get install nodejs npm
+ls
+npm install -g react-app
+ls
+npm install -g create-react-app
+ls
+npx create-react-app react-app
+ls
+rm -rf react-app/
+ls
+ln /home/jg/바탕화면/react-app/ react-app
+ls
+gob 
+ls
+vim app.log 
+source ~/.bashrc 
+cpreact 
+ls
+cd ..
+cpreact 
+ls
+vim frontend/react
+vim frontend/react.js 
+cpreact 
+git status
+git add backend/
+git status
+cd frontend/
+git status
+cd react-app/
+git status
+git config --global --add safe.directory /root/mnt/weather-assignment/frontend/react-app
+git status
+cd ..
+ls
+cd..
+ls
+cd ..
+git status
+git add .
+git satus
+git staus
+git status
+cd frontend/
+git status
+cd react-app/
+git status
+git add .
+git status
+cd ..
+git status
+cd react-app/
+ls
+git status
+git commit
+git status
+cd ..
+ls
+git status
+git commit --amend
+git status
+ls
+cd ..
+ls
+cd history/
+ls
+mkdir day1
+mv * day1/
+ls
+mkdir day2
+cd day2/
+ls
+ls -al
+exit
+cd /home/jg
+ls
+cd 바탕화면
+ls
+rm -rf *
+ls
+npx create-react-app react-app
+ls
+cd react-app/
+ls
+cd src/
+ls
+vim App.js 
+ls
+vim index.
+vim index.js 
+ls
+cd ..
+ls
+cd ..
+ls
+cd -
+ls
+cd public/
+ls
+vim index.html 
+ls
+cd ..
+ls
+cd src/
+ls
+vim App.js 
+ls
+grep -rni app.js
+cd ..
+grep -rni app.js
+cd public/
+grep -rni app.js
+ls
+vim index.html 
+cd. .
+cd ..
+ls
+npm run build
+ls
+cd build/
+python -m http.server 8000
+python3 -m http.server 8000
+history
+exit
+ls
+history
+ls
+apt-get install python3 python3-pip
+pip3 install flask flaks-cors
+apt search python3-flask
+apt-get install python3-flask python3-flask-coirs
+apt-get install python3-flask python3-flask-cors
+ls
+cd root/
+ls
+cd weather-assignment/
+ls
+mkdir backend
+ls
+mv test.py backend/
+ls
+mkdir history
+ls
+mv output.txt backend/
+ls
+cd backend/
+ls
+vim test.py 
+vim ~/.vimrc 
+source ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc
+vim ~/.vimrc 
+source ~/.vimrc
+vim test.py 
+source ~/.vimrc && vim test.py 
+lks
+ls
+black test.py 
+apt install black
+black test.py 
+vim test.py 
+Plug 'morhetz/gruvbox'
+apt search gruvbox
+apt-get install vim-gruvbox
+ls
+vim test.py 
+source ~/.vimrc
+vim test.py 
+source ~/.vimrc
+vim test.py 
+ls
+cd ..
+ls
+cd ../../..
+ls
+cd /root/mnt/
+ls
+cd weather-assignment/
+ls
+cd backend/
+ls
+python3 test.py 
+vim test.py 
+python3 test.py 
+vim test.py 
+python3 test.py 
+ls
+cd ..
+ls
+cd backend/
+ls
+python3 test.py 
+ls
+vim test.py 
+source ~/.vimrc 
+vim test.py 
+source ~/.vimrc 
+ls
+vim test.py 
+exit
+vim test.py 
+python3 test.py 
+vim test.py 
+python3 test.py 
+vim test.py 
+ls
+rm -rf .test.py.swp 
+python3 test.py 
+vim test.py 
+rm rf .test.py.swp 
+rm -rf .test.py.swp 
+ls
+vim test.py 
+python3 test.py 
+vim test.py 
+python3 test.py 
+ls
+vim distinct_values.txt 
+ls
+mv distinct_values.txt ../frontend/react-app/src/
+ls
+cd ..
+cd frontend/
+ls
+cd react-app/
+ls
+cds r
+ls
+cd src/
+ls
+mv distinct_values.txt distinct.txt
+ls
+vim distinct.txt 
+ls
+vim utils.js
+ls
+cp distinct.txt distinct.js
+vim distinct.
+vim distinct.js 
+ls
+python3 test.py 
+ls
+cd ../..
+ls
+cd ../backend/
+ls
+python3 test.py 
+vim test.py 
+ls
+python3 test.py 
+vim test.py 
+lsof | grep test.py 
+rm -rf .test.py.swp 
+ls
+ls -al
+ps aux | grep vim
+kill 34788
+ls -al
+rm -rf .test.py.swp 
+ls
+ls- al
+ls -al
+ps aux | grep vim
+kill 34788
+ps aux | grep vim
+kill -9 34788
+ps aux | grep vim
+rm -rf .test.py.swp 
+ls -al
+history
+exit

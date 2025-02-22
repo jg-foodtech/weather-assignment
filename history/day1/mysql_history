@@ -1,0 +1,82 @@
+_HiStOrY_V2_
+ls
+;
+SHOW DATABASE;
+SHOW DABASE
+;
+show databases;
+CREATE DATABASE weather_db;
+USE weather_db;
+CREATE TABLE weather_data (
+id INT AUTO_INCREMENT PRIMARY KEY,
+sido VARCHAR(50),
+sigungu VARCHAR(50),
+dong VARCHAR(50),
+datetime DATETIME,
+temperature FLOAT,
+precipitation FLOAT,
+snowfall FLOAT
+);
+CREATE TABLE weather_data ( id INT AUTO_INCREMENT PRIMARY KEY, sido VARCHAR(50), sigungu VARCHAR(50), dong VARCHAR(50), datetime DATETIME, temperature FLOAT, precipitation FLOAT, snowfall FLOAT );
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv'
+INTO TABLE weather_data
+FIELDS TEMINATED BY ','
+LINES TERMINATED 
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv'
+INTO TABLE weather_data
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\134n'
+IGNORE 1 ROWS
+(sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv' INTO TABLE weather_data FIELDS TERMINATED BY ',' LINES TERMINATED BY '\134n' IGNORE 1 ROWS (sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+show variables like 'secure_file_riv';
+show variables like 'secure_file_priv';
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv'                  
+INTO TABLE weather_data                                            
+FIELDS TERMINATED BY ','                                           
+LINES TERMINATED BY '\134n'                                           
+IGNORE 1 ROWS                                                      
+(sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv'                   INTO TABLE weather_data                                             FIELDS TERMINATED BY ','                                            LINES TERMINATED BY '\134n'                                            IGNORE 1 ROWS                                                       (sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+LOAD DATA INFILE '/root/mnt/forecast_weather.csv'                  
+INTO TABLE weather_data                                            
+FIELDS TERMINATED BY ','                                           
+LINES TERMINATED BY '\134n'                                           
+IGNORE 1 ROWS                                                      
+LOAD DATA INFILE '/var/lib/mysql-files/forecast_weather.csv'
+INTO TABLE weather_data
+FIELDS TERMINATED BY ','
+LINES TERMINATED BY '\134n'
+IGNORE 1 ROWS
+(sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+LOAD DATA INFILE '/var/lib/mysql-files/forecast_weather.csv' INTO TABLE weather_data FIELDS TERMINATED BY ',' LINES TERMINATED BY '\134n' IGNORE 1 ROWS (sido, sigungu, dong, datetime, temperature, precipitation, snowfall);
+CREATE INDEX idx_temperature ON weather_data (temperature);
+SELECT * FROM weather_data WHERE temperature < -10.0;
+SELECT * FROM weather_data WHERE temperature < -15.0;
+select unique();
+select distinct sido from weather_db;
+select * from weather_db;
+show databases;
+show tables;
+select distinct 1, 2, 3 from weather_data;
+select distinct sido, sigungu, dong from weather_data;
+\134q
+USE mysql;
+USE weather_db
+exit
+grant all privileges on weather_db.* to 'jingi'@'localhost';
+flush privileges
+exit
+flush privileges;
+exit
+select column_name from information_schema.columns where table_schema = 'weather_db'
+select column_name from information_schema.columns where table_schema = 'weather_db';
+exit
+SELECT DATABASE()
+SELECT DATABASE();
+SHJOW DATABASES;
+history
+exit
+select distinct 1, 2, 3 from weather_data;
+q
+exit
