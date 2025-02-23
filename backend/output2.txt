@@ -1,0 +1,1 @@
+SELECT sido, sigungu, dong, datetime, temperature, snowfall, precipitation FROM weather_data WHERE sido = '경기도' LIMIT 10

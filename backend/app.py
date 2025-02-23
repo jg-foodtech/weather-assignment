@@ -2,11 +2,12 @@ import pymysql
 import logging
 from flask import Flask, jsonify, request
 from flask_cors import CORS
+from queryBuilder import QueryBuilder
 
 app = Flask(__name__)
 CORS(app)  # For local
 
-handler = logging.FileHandler('app.log')
+handler = logging.FileHandler('log.log')
 handler.setLevel(logging.DEBUG)
 app.logger.addHandler(handler)
 
@@ -49,23 +50,46 @@ mydb = pymysql.connect(host="127.0.0.1",
 #finally:
 #    mydb.close()
     
+	
+#   query = """
+#	SELECT id, sido, sigungu, dong, datetime, temperature, precipitation, snowfall
+#    FROM weather_data
+#	WHERE datetime >= '2024-12-22:00'
+#	AND temperature <= -22;
+#	"""
 
-## API 엔드포인트
 @app.route('/api/items', methods=['GET'])
 def get_items():
-    cursor = mydb.cursor()
-    query = """
-	SELECT id, sido, sigungu, dong, datetime, temperature, precipitation, snowfall
-    FROM weather_data
-	WHERE datetime >= '2024-12-22:00'
-	AND temperature <= -22;
-	"""
-    cursor.execute(query)
-    rows = cursor.fetchall()
-    data = []
-    for row in rows:
-        data.append({'id': row[0], 'id1': row[1], 'id2': row[2], 'id3': row[3], 'id4': row[4], 'id5': row[5], 'id6': row[6], 'id7': row[7]})
-    return jsonify(data)
+	cursor = mydb.cursor()
+	
+	builder = QueryBuilder("weather_data")
+	select_columns = request.args.get("select")
+	if select_columns:
+		builder.select(*select_columns.split(","))
+
+	wheres = request.args.getlist("where")
+	for condition in wheres:
+		builder.where(condition)
+
+	order_by = request.args.get("order")
+	if order_by:
+		builder.order(order_by, desc=request.args.get("desc", "false").lower() == "true")
+
+	limit = request.args.get("limit", type=int)
+	if limit:
+		builder.limit_results(limit)
+
+	query = builder.build()
+
+	with open("output2.txt", "w") as file:
+		file.write(query)
+
+	cursor.execute(query)
+	rows = cursor.fetchall()
+	data = []
+	for row in rows:
+		data.append({'id': row[0], 'id1': row[1], 'id2': row[2]}) #, 'id3': row[3], 'id4': row[4], 'id5': row[5], 'id6': row[6], 'id7': row[7]})
+	return jsonify(data)
 
 @app.route('/api/hello', methods=['GET'])
 def hello():
