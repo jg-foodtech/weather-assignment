@@ -20,11 +20,11 @@ class QueryBuilder:
         if not match:
             raise ValueError(f"Invalid condition format: {condition}")
         
-        if not isinstance(value, (int, float, bool)):  
-            value = f"'{value}'"
-        str = f"{column} {operator} {value}"
+        if not isinstance(value, (int, float, bool)):
+            value = value if isinstance(value, str) and value.isdigit() else f"'{value}'"
+        ret = f"{column} {operator} {value}"
         
-        self.conditions.append(str)
+        self.conditions.append(ret)
         return self
 
     def order(self, column, desc=False):

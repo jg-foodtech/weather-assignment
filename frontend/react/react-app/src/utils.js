@@ -28,27 +28,25 @@ export function getThirdElements(first, second) {
     return uniqueThird;
 }
 
-export function korToEng(str) {
-    switch(str) {
-        case '도/특별시/광역시':
-            return 'sido';
-        case '시/군/구':
-            return 'sigungu';
-        case '읍/면/동':
-            return 'dong';
-        case '날짜':
-            return 'datetime';
-        case '기온':
-            return 'temperature';
-        case '강수량':
-            return 'precipitation';            
-        case '적설량':
-            return 'snowfall';
-        default:
-            break;
-    }
-    console.log("Cannot reach here");
-    return "";
+const languageMap = {
+    '도/특별시/광역시': 'sido',
+    '시/군/구': 'sigungu',
+    '읍/면/동': 'dong',
+    '날짜': 'datetime',
+    '기온': 'temperature',
+    '강수량': 'precipitation',
+    '적설량': 'snowfall',
+    'sido': '도/특별시/광역시',
+    'sigungu': '시/군/구',
+    'dong': '읍/면/동',
+    'datetime': '날짜',
+    'temperature': '기온',
+    'precipitation': '강수량',
+    'snowfall': '적설량',
+  };
+
+export function translate(str) {
+  return languageMap[str] || str;
 }
 
 export function stringToOperator(str) {
@@ -70,6 +68,5 @@ export function stringToOperator(str) {
             break;
     }
     
-    console.log("Cannot reach here");
-    return "";
+    return str;
 }

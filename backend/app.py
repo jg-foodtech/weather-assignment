@@ -71,7 +71,7 @@ def get_items():
 	for condition in wheres:
 		builder.where(condition)
 
-	order_by = request.args.get("order")
+	order_by = request.args.get("orderby")
 	if order_by:
 		builder.order(order_by, desc=request.args.get("desc", "false").lower() == "true")
 
@@ -81,14 +81,20 @@ def get_items():
 
 	query = builder.build()
 
-	with open("output2.txt", "w") as file:
-		file.write(query)
 
 	cursor.execute(query)
 	rows = cursor.fetchall()
+	columns = [description[0] for description in cursor.description]
 	data = []
 	for row in rows:
-		data.append({'id': row[0], 'id1': row[1], 'id2': row[2]}) #, 'id3': row[3], 'id4': row[4], 'id5': row[5], 'id6': row[6], 'id7': row[7]})
+		row_data = dict(zip(columns, row))
+		data.append(row_data)
+
+
+	with open("output2.txt", "w") as file:
+		file.write(query)
+		file.write("Data: " + str(data) + "\n")
+	
 	return jsonify(data)
 
 @app.route('/api/hello', methods=['GET'])

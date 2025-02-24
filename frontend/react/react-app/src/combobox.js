@@ -1,9 +1,23 @@
-const Combobox = ({ options, label, value, onChange, disabled }) => {
+import { useEffect } from 'react';
+
+const Combobox = ({ options, label, value, onChange, placeholder="선택 안함", disabled=false, defaultIndex }) => {
+  useEffect(() => {
+    if (defaultIndex !== undefined && !value && options.length > 0) {
+      onChange(options[defaultIndex]);
+    }
+  }, [options, value, defaultIndex, onChange]);
+
   return (
-    <div>
+    <div key = {label}>
       <label>{label}</label>
-      <select value={value} onChange={(e) => onChange(e.target.value) } disabled={disabled}>
-        <option value="">Select an option</option>
+      <select 
+        value={value}
+        onChange={(e) => onChange(e.target.value) }
+        disabled={disabled}
+      >
+      <option value="" disabled hidden>
+        {placeholder}
+      </option>
         {options.map((option) => (
           <option key={option} value={option}>
             {option}
@@ -28,9 +42,98 @@ const Entry = ({ label, placeholder, value, onChange }) => {
   );
 }
 
-const Checkbox = ({ label, index, checked, onChange }) => {
+const TwoEntryCheckbox = ({ title, firstValue, firstChanged, secondValue, secondChanged, disabled, minChecked, minChanged, maxChecked, maxChanged }) => {
+  useEffect(() => {
+    // Remove entries if min or max is selected
+    if (maxChecked || minChecked) {
+      firstChanged('');
+      secondChanged('');
+    }
+  }, [maxChecked, minChecked, firstChanged, secondChanged]);
+
   return (
-    <div style={{ marginRight: '20px' }}>
+    <div>
+      <span>{ title }</span>
+      <div>
+        <input
+          type="text"
+          style={{ width: '80px' }}
+          value={firstValue}
+          onChange={(s) => firstChanged(s.target.value)}
+          placeholder={`최소 ${title}`}
+          disabled={disabled}
+        />
+        <label>{"이상"}</label>
+      </div>
+      <div>
+        <input
+          type="text"
+          style={{ width: '80px' }}
+          value={secondValue}
+          onChange={(s) => secondChanged(s.target.value)}
+          placeholder={`최대 ${title}`}
+          disabled={disabled}
+        />
+        <label>{"이하"}</label>        
+      </div>
+      <Checkbox
+        label={"최소"}
+        checked={minChecked}
+        onChange={minChanged}
+      />
+      <Checkbox
+        label={"최대"}
+        checked={maxChecked}
+        onChange={maxChanged}
+    />
+    </div>
+  );
+}
+
+const TwoEntry = ({ title, firstValue, firstChanged, secondValue, secondChanged }) => {
+  return (
+    <div>
+      <span>{ title }</span>
+      <div>
+        <input
+          type="text"
+          style={{ width: '80px' }}
+          value={firstValue}
+          onChange={(s) => firstChanged(s.target.value)}
+          placeholder={`최소 ${title}`}
+        />
+        <label>{"이상"}</label>
+      </div>
+      <div>
+        <input
+          type="text"
+          style={{ width: '80px' }}
+          value={secondValue}
+          onChange={(s) => secondChanged(s.target.value)}
+          placeholder={`최대 ${title}`}
+        />
+        <label>{"이하"}</label>        
+      </div>
+    </div>
+  );
+}
+
+const Checkbox = ({ label, checked, onChange }) => {
+  return (
+    <div style={{ marginLeft: '20px' }}>
+      <input
+        type="checkbox"
+        checked={checked}
+        onChange={onChange}
+      />
+      <label>{label}</label>
+    </div>
+  );
+};
+
+const CheckboxWithIndex = ({ label, checked, index, onChange }) => {
+  return (
+    <div key = {index} style={{ marginRight: '20px' }}>
       <input
         type="checkbox"
         checked={checked}
@@ -41,7 +144,7 @@ const Checkbox = ({ label, index, checked, onChange }) => {
   );
 };
 
-const EntryCombobox = ({ entryLabel, entryPlaceholder, entryChanged, comboLabel, comboOptions, comboValue, comboboxChanged, comboDisabled }) => {
+const EntryCombobox = ({ entryLabel, entryPlaceholder, entryChanged, comboLabel, comboOptions, comboValue, comboboxChanged, comboPlaceholder, comboDisabled }) => {
   return (
     <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
       <Entry 
@@ -54,10 +157,11 @@ const EntryCombobox = ({ entryLabel, entryPlaceholder, entryChanged, comboLabel,
         options={comboOptions} 
         value={comboValue} 
         onChange={comboboxChanged}
+        placeholder={comboPlaceholder}
         disabled={comboDisabled}
       />
     </div>
   );
 };
 
-export { Combobox, Entry, Checkbox, EntryCombobox }
+export { Combobox, Checkbox, Entry, CheckboxWithIndex, EntryCombobox, TwoEntry, TwoEntryCheckbox }
