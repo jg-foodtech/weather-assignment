@@ -1,0 +1,5 @@
+aximum update depth exceeded. This can happen when a component calls setState inside useEffect, but useEffect either doesn't have a dependency array, or one of the dependencies changes on every render. 2378 react-dom-client.development.js:3805
+    React 4
+    handleFirstChanged App.js:130
+    firstChanged App.js:158
+    TwoEntryCheckbox combobox.js:49

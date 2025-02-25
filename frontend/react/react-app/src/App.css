@@ -1,8 +1,5 @@
-.horizontal_container {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
+/* App.css */
+
 
 .App {
   text-align: center;

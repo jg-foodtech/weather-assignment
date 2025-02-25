@@ -8,7 +8,7 @@ const Combobox = ({ options, label, value, onChange, placeholder="선택 안함"
   }, [options, value, defaultIndex, onChange]);
 
   return (
-    <div key = {label}>
+    <div key = {label} style = {{ marginBottom: '3px'}}>
       <label>{label}</label>
       <select 
         value={value}
@@ -45,14 +45,14 @@ const Entry = ({ label, placeholder, value, onChange }) => {
 const TwoEntryCheckbox = ({ title, firstValue, firstChanged, secondValue, secondChanged, disabled, minChecked, minChanged, maxChecked, maxChanged }) => {
   useEffect(() => {
     // Remove entries if min or max is selected
-    if (maxChecked || minChecked) {
+    if ((maxChecked || minChecked) && (firstValue !== '' || secondValue !== '')) {
       firstChanged('');
       secondChanged('');
     }
-  }, [maxChecked, minChecked, firstChanged, secondChanged]);
+  }, [maxChecked, minChecked, firstChanged, secondChanged, firstValue, secondValue]);
 
   return (
-    <div>
+    <div style={{ marginLeft: '15px', marginRight: '15px' }}>
       <span>{ title }</span>
       <div>
         <input
@@ -118,13 +118,14 @@ const TwoEntry = ({ title, firstValue, firstChanged, secondValue, secondChanged 
   );
 }
 
-const Checkbox = ({ label, checked, onChange }) => {
+const Checkbox = ({ label, checked, onChange, disabled = false }) => {
   return (
-    <div style={{ marginLeft: '20px' }}>
+    <div style={{ marginLeft: '10px', marginRight: '10px' }}>
       <input
         type="checkbox"
         checked={checked}
         onChange={onChange}
+        disabled={disabled}
       />
       <label>{label}</label>
     </div>

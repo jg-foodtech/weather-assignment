@@ -1,4 +1,12 @@
 export const ShowAll = '모두 보기';
+
+// FIXME: Get values from server
+export const TableNames = [
+    'weather_data',
+    '미래 날씨',
+    '과거 날씨'
+ ];
+
 export const ColumnNames = [
     '도/특별시/광역시', 
     '시/군/구',

@@ -6,11 +6,21 @@ class ParamBuilder {
       this.params = [];
     }
   
-    select(fields) {
+    select(fields, distinct) {
       if (fields && Array.isArray(fields)) {
         this.params.push(`select=${fields.join(',')}`);
       } else {
         this.params.push(`select=*`);
+      }
+      if (distinct) {
+        this.params.push(`distinct=${distinct ? 'true' : 'false'}`);
+      }
+      return this;
+    }
+
+    from(table) {
+      if (table) {
+        this.params.push(`from=${table}`);
       }
       return this;
     }
@@ -23,13 +33,12 @@ class ParamBuilder {
           this.params.push(`where=${column}${operator}${value}`);
         } else {
           this.params.push(`where=${column}=${value}`);
-          console.log(`where=${column}=${value}`);
         }
       }
       return this;
     }
   
-    orderby(column, desc = false) {
+    orderBy(column, desc) {
       // Ignore if exist
       if (this.params.some(param => param.startsWith("orderby="))) {
         return this;
