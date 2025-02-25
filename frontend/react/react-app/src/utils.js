@@ -43,7 +43,17 @@ const languageMap = {
     'temperature': '기온',
     'precipitation': '강수량',
     'snowfall': '적설량',
+    '미래 날씨': 'forecast',
+    'forecast': '미래 날씨',
+    "과거 날씨": 'history',
+    'history': "과거 날씨",
   };
+
+  export const TableNames = [
+    'weather_data',
+    '미래 날씨',
+    '과거 날씨'
+ ];
 
 export function translate(str) {
   return languageMap[str] || str;

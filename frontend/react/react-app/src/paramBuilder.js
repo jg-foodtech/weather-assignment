@@ -20,7 +20,9 @@ class ParamBuilder {
 
     from(table) {
       if (table) {
-        this.params.push(`from=${table}`);
+        console.log("table = ", table);
+        console.log(utils.translate(table));
+        this.params.push(`from=${utils.translate(table)}`);
       }
       return this;
     }
@@ -59,9 +61,36 @@ class ParamBuilder {
       return this;
     }
   
-    build() {
+    build(checkedLabels, queryConfig, columnData) {
+      this
+      .select(checkedLabels, queryConfig.distinct)
+      .from(queryConfig.table)
+      .where(constant.ColumnNames[0], queryConfig.region1)
+      .where(constant.ColumnNames[1], queryConfig.region2)
+      .where(constant.ColumnNames[2], queryConfig.region3)
+
+      columnData.forEach(({ name, greaterThan, lessThan, onlyMin, onlyMax }) => {
+        this.where(name, greaterThan, ">=").where(name, lessThan, "<=");
+        if (onlyMin) this.orderBy(name, false);
+        if (onlyMax) this.orderBy(name, true);
+      });
+      this.orderBy(queryConfig.orderBy, queryConfig.desc).limit(queryConfig.limit);
       return this.params.join('&');
     }
+
+    buildExplainQuery(queryConfig, columnData) {
+      this
+        .from(queryConfig.table)
+        .where(constant.ColumnNames[0], queryConfig.region1)
+        .where(constant.ColumnNames[1], queryConfig.region2)
+        .where(constant.ColumnNames[2], queryConfig.region3);
+
+      columnData.forEach(({ name, greaterThan, lessThan }) => {
+        this.where(name, greaterThan, ">=").where(name, lessThan, "<=");
+      });
+
+      return this.params.join('&');
+  }
   }
   
   export default ParamBuilder;
