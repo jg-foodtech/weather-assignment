@@ -57,6 +57,15 @@ class QueryBuilder:
              file.write(sql)
         return sql
     
+    def explain(self):
+        sql = f"SELECT COUNT(*) FROM {self.table}"
+
+        if self.conditions:
+            sql += " WHERE " + " AND ".join(self.conditions)
+
+        logging.debug(sql)
+        return sql
+    
     def clear(self):
         return
 
@@ -69,13 +78,13 @@ class DatabaseManager:
                                     db="weather_db") # FIXME
         self.query = None
         self.queryBuilder = None    
+        self.cursor = self.conn.cursor()
         
     def get_columns(self, table):
-        cursor = self.conn.cursor()
- 
         self.queryBuilder.build()
-        cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {table}")
-
+        data = self.cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {table}")
+        data = self.cursor.fetchall()
+        self.cursor.close()
         return data;
 
     def prepare(self, table, distinct, columns, wheres, order_by, desc, limit):
@@ -95,28 +104,31 @@ class DatabaseManager:
 
         self.set_query(self.queryBuilder.build())
 
+    def explain(self, table, wheres):
+        self.queryBuilder = QueryBuilder(table)
+        for condition in wheres:
+            self.queryBuilder.where(condition)
+        self.set_query(self.queryBuilder.explain())
+
     def set_query(self, query):
         self.query = query
 
     def fetch_all(self):
-        cursor = self.conn.cursor()
-        cursor.execute(self.query)
-        data = cursor.fetchall()
-        cursor.close()
+        self.cursor.execute(self.query)
+        data = self.cursor.fetchall()
         return data
     
     def fetch_one(self):
-        cursor = self.conn.cursor()
+        cursor = self.cursor
         cursor.execute(self.query)
-        data = cursor.fetchall()
-        cursor.close()
+        data = cursor.fetchone()
 
         data_str = "\n".join([str(row) for row in data])
-        # 파일에 저장
         with open("output2.txt", "a") as file:
             file.write(data_str + "\n")
         return data
     
     def clear(self):
-        self.queryBuilder.clear()
+        self.queryBuilder = None
+        self.cursor.close()
         return
