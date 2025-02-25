@@ -1,105 +1,82 @@
-import pymysql
 import logging
 from flask import Flask, jsonify, request
 from flask_cors import CORS
-from queryBuilder import QueryBuilder
+from databaseManager import DatabaseManager
+import json
+
 
 app = Flask(__name__)
 CORS(app)  # For local
 
-handler = logging.FileHandler('log.log')
+app.logger.setLevel(logging.DEBUG)
+handler = logging.StreamHandler()
 handler.setLevel(logging.DEBUG)
+formatter = logging.Formatter('%(asctime)s - %(levelname)s - %(message)s')
+handler.setFormatter(formatter)
 app.logger.addHandler(handler)
 
-mydb = pymysql.connect(host="127.0.0.1", 
-					   user="jingi", 
-					   passwd="123",
-					   db="weather_db")
+# Suppose that forecast and history have same column
+@app.route('/api/weather/columns', methods=['GET'])
+def get_table_columns():
+	dbManager = DatabaseManager()
+	dbManager.set_query("SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME=weather_data")
+	dbManager = DatabaseManager()
+	data = dbManager.fetch_all()
+	result = [{"COLUMN_NAME": row[0]} for row in data]
+	return {"columns": result}
 
-
-# try:
-#     cursor = mydb.cursor()
-#     query = """
-# 	SELECT id, sido, sigungu, dong, datetime, temperature, precipitation, snowfall
-#     FROM weather_data
-# 	WHERE datetime >= '2024-12-22:00'
-# 	AND temperature <= -18;
-# 	"""
-
-#     cursor.execute(query)
-#     result = cursor.fetchall()
-#     with open("output.txt", "w") as file:
-#         for row in result:
-#             file.write(" | ".join(map(str, row)) + "\n")
-# finally:
-#     cursor.close()
-#     mydb.close()
-
-# DB에서 고유한 시군구동면읍 추출
-#try:
-#    with mydb.cursor() as cursor:
-#        query = "SELECT DISTINCT sido, sigungu, dong FROM weather_data"
-#        cursor.execute(query)
-#
-#        result = cursor.fetchall()
-#
-#        with open('distinct_values.txt', mode='w', encoding='utf-8') as file:
-#            for row in result:
-#                file.write(f"[{', '.join(map(str, row))}]\n")
-#
-#finally:
-#    mydb.close()
-    
+@app.route('/api/weather/minmax', methods=['GET'])
+def get_column_minmax():
+	table_name = request.args.get("from")
+	dbManager = DatabaseManager()
+	dbManager.set_query(f"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME='{table_name}'")
+	columns = dbManager.fetch_all()
+	minmax_data = {}
 	
-#   query = """
-#	SELECT id, sido, sigungu, dong, datetime, temperature, precipitation, snowfall
-#    FROM weather_data
-#	WHERE datetime >= '2024-12-22:00'
-#	AND temperature <= -22;
-#	"""
+	for column in columns:
+		column_name = column[0]
+		data_type = column[1]
+		is_nullable = column[2]
+		dbManager.set_query(f"SELECT MIN({column_name}) AS min, MAX({column_name}) AS max FROM {table_name}")
+		data = dbManager.fetch_one()
+		min_val, max_val = data[0]
+		minmax_data[column_name] = {
+			'min': min_val,
+			'max': max_val,
+			'data_type': data_type,
+			'is_nullable': is_nullable
+		}
+	app.logger.debug('RETURN COMPLETE')
+	return jsonify(minmax_data)
 
-@app.route('/api/items', methods=['GET'])
+@app.route('/api/weather/items', methods=['GET'])
 def get_items():
-	cursor = mydb.cursor()
-	
-	builder = QueryBuilder("weather_data")
-	select_columns = request.args.get("select")
-	if select_columns:
-		builder.select(*select_columns.split(","))
-
+	columns = request.args.get("select")
+	distinct = request.args.get("distinct", "false").lower() == "true"
+	table = request.args.get("from")
 	wheres = request.args.getlist("where")
-	for condition in wheres:
-		builder.where(condition)
-
 	order_by = request.args.get("orderby")
-	if order_by:
-		builder.order(order_by, desc=request.args.get("desc", "false").lower() == "true")
-
+	desc=request.args.get("desc", "false").lower() == "true"
 	limit = request.args.get("limit", type=int)
-	if limit:
-		builder.limit_results(limit)
 
-	query = builder.build()
+	dbManager = DatabaseManager()
+	dbManager.prepare(table,
+		   			  distinct,
+		   			  columns,
+					  wheres,
+					  order_by,
+					  desc,
+					  limit)
 
-
-	cursor.execute(query)
-	rows = cursor.fetchall()
-	columns = [description[0] for description in cursor.description]
+	rows = dbManager.fetch_all()
 	data = []
+	columns = columns.split(",")
 	for row in rows:
 		row_data = dict(zip(columns, row))
 		data.append(row_data)
 
-
-	with open("output2.txt", "w") as file:
-		file.write(query)
-		file.write("Data: " + str(data) + "\n")
-	
+	app.logger.debug('RETURN COMPLETE')
 	return jsonify(data)
-
-@app.route('/api/hello', methods=['GET'])
-def hello():
-	return jsonify({"message": "Hello from Flask API!"})
 
 if __name__ == '__main__':
 	app.run(debug=True, host='0.0.0.0', port=5000)
