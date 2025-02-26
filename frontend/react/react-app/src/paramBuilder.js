@@ -20,8 +20,6 @@ class ParamBuilder {
 
     from(table) {
       if (table) {
-        console.log("table = ", table);
-        console.log(utils.translate(table));
         this.params.push(`from=${utils.translate(table)}`);
       }
       return this;
@@ -55,42 +53,61 @@ class ParamBuilder {
     }
   
     limit(count) {
-      if (count !== constant.ShowAll) {
+      if (count !== constant.SHOW_ALL) {
         this.params.push(`limit=${count}`);
       }
       return this;
     }
-  
-    build(checkedLabels, queryConfig, columnData) {
-      this
-      .select(checkedLabels, queryConfig.distinct)
-      .from(queryConfig.table)
-      .where(constant.ColumnNames[0], queryConfig.region1)
-      .where(constant.ColumnNames[1], queryConfig.region2)
-      .where(constant.ColumnNames[2], queryConfig.region3)
 
-      columnData.forEach(({ name, greaterThan, lessThan, onlyMin, onlyMax }) => {
-        this.where(name, greaterThan, ">=").where(name, lessThan, "<=");
-        if (onlyMin) this.orderBy(name, false);
-        if (onlyMax) this.orderBy(name, true);
-      });
-      this.orderBy(queryConfig.orderBy, queryConfig.desc).limit(queryConfig.limit);
+    build(queryConfig) {
+      const selectedColumns = queryConfig.columnData
+      .filter(item => item.checked)
+      .map(item => utils.translate(item.name));
+
+      this
+        .select(selectedColumns, queryConfig.distinct)
+        .from(queryConfig.table);
+    
+      queryConfig.columnData
+        .filter(column => !column.rangable && column.name)
+        .forEach(column => this.where(column.name, column.region));
+    
+      queryConfig.columnData
+        .filter(column => column.rangable)
+        .forEach(({ name, greaterThan, lessThan, onlyMin, onlyMax }) => {
+          this.where(name, greaterThan, ">=");
+          this.where(name, lessThan, "<=");
+          if (onlyMin) this.orderBy(name, false);
+          if (onlyMax) this.orderBy(name, true);
+        });
+    
+      this.orderBy(queryConfig.orderBy, queryConfig.desc)
+          .limit(queryConfig.limit);
+    
       return this.params.join('&');
     }
 
-    buildExplainQuery(queryConfig, columnData) {
+    buildExplainQuery(queryConfig) {
+      const selectedColumns = queryConfig.columnData
+      .filter(item => item.checked)
+      .map(item => utils.translate(item.name));
+      
       this
-        .from(queryConfig.table)
-        .where(constant.ColumnNames[0], queryConfig.region1)
-        .where(constant.ColumnNames[1], queryConfig.region2)
-        .where(constant.ColumnNames[2], queryConfig.region3);
+        .select(selectedColumns, queryConfig.distinct)
+        .from(queryConfig.table);
 
-      columnData.forEach(({ name, greaterThan, lessThan }) => {
+      queryConfig.columnData
+        .filter(column => !column.rangable && column.name)
+        .forEach(column => this.where(column.name, column.region));
+
+      queryConfig.columnData
+        .filter(column => column.rangable)
+        .forEach(({ name, greaterThan, lessThan }) => {
         this.where(name, greaterThan, ">=").where(name, lessThan, "<=");
       });
 
       return this.params.join('&');
-  }
+    }
   }
   
   export default ParamBuilder;

@@ -25,6 +25,11 @@ export const fetchWeatherItems = async (params) => {
   return response.data;
 };
 
+export const fetchWeatherItems2 = async (params) => {
+  const response = await axios.get(`${getApiUrl()}/api/weather/natural?${params}`);
+  return response.data;
+};
+
 export const fetchMinMaxData = async (param) => {
   const response = await axios.get(`${getApiUrl()}/api/weather/minmax?${param}`);
   return response.data;

@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 
-const Combobox = ({ options, label, value, onChange, placeholder="선택 안함", disabled=false, defaultIndex }) => {
+const Combobox = ({ options, label, value, onChange, placeholder="선택 안함", disabled=false, defaultIndex, width }) => {
   useEffect(() => {
     if (defaultIndex !== undefined && !value && options.length > 0) {
       onChange(options[defaultIndex]);
@@ -8,7 +8,7 @@ const Combobox = ({ options, label, value, onChange, placeholder="선택 안함"
   }, [options, value, defaultIndex, onChange]);
 
   return (
-    <div key = {label} style = {{ marginBottom: '3px'}}>
+    <div key = {label} style = {{ width: width || "auto", display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: "3px"}}>
       <label>{label}</label>
       <select 
         value={value}

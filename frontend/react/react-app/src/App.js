@@ -1,76 +1,99 @@
 import React, { useState, useMemo, useEffect  } from 'react';
 import ParamBuilder from "./paramBuilder";
 import TableDisplay from './tableDisplay';
-import { fetchWeatherItems, fetchMinMaxData, fetchWeatherExplain } from './service';
+import { fetchWeatherItems, fetchMinMaxData, fetchWeatherExplain, fetchWeatherItems2 } from './service';
 import { TableRegionSection, QueryDataSection, OrderLimitSection, SelectColumnsSection } from "./uiSection";
+import { generateNaturalLanguageQuery } from "./queryGenerator";
 import * as utils from './utils';
 import * as constant from "./constant";
 import './App.css';
 
 const initialQueryConfig = {
   table: "",
-  region1: "",
-  region2: "",
-  region3: "",
-  orderBy: constant.ColumnNames[0],
+  columnData: constant.COLUMN_NAMES.map((name, index) => ({
+    name: name,
+    rangable: index >= constant.REGION_INDEX_LIMIT,
+    ...(index < constant.REGION_INDEX_LIMIT 
+      ? { region: "" } // selected regions
+      : { greaterThan: '', lessThan: '', onlyMin: false, onlyMax: false } // selected conditions
+    ),
+    checked: true
+  })),
+  orderBy: constant.COLUMN_NAMES[0],
   orderFixed: false,
   desc: true,
-  limit: constant.LimitOptions[3],
+  limit: constant.LIMIT_OPTIONS[constant.LIMIT_OPTIONS.length - 1],
   distinct: false,
 };
-
-// FIXME: int to string or something.. not use 3,4,5,6
-const initialColumnData = constant.ColumnNames.slice(3, 7).map(name => ({
-    name: name, greaterThan: '', lessThan: '', onlyMin: false, onlyMax: false
-}));
 
 function App() {
   const [sortedItems, setSortedItems] = useState([]); // Object is not ordered by select order
   const [loading, setLoading] = useState(false);
-  const [information, setInformation] = useState("");
   const [minMaxData, setMinMaxData] = useState({});
   const [queryConfig, setQueryConfig] = useState(initialQueryConfig);
-  // Better to merge with queryConfig?
-  const [columnData, setColumnData] = useState(initialColumnData);
-    // Output Checkbox to decide columns to see 
-  const [checkedItems, setCheckedItems] = useState(
-    constant.ColumnNames.map(name => ({ label: name, checked: true })),
-  );
-  
+  const [naturalQuery, setNaturalQuery] = useState("");
+  const [information, setInformation] = useState("");
+  const [showTable, setShowTable] = useState(false);
+
   useEffect(() => {
     fetchData();
   }, [queryConfig.table]);
 
+  useEffect(() => {
+    setNaturalQuery(generateNaturalLanguageQuery(queryConfig));
+  }, [queryConfig]);
+
+  // To adjust column order when showing query results
   const checkedLabels = useMemo(
-    () => checkedItems.filter(item => item.checked).map(item => utils.translate(item.label)),
-    [checkedItems]
+    () => queryConfig.columnData
+      .filter(item => item.checked)
+      .map(item => utils.translate(item.name)),
+    [queryConfig.columnData]
   );
 
   const clearConfig = () => { 
     setQueryConfig(initialQueryConfig);
-    setColumnData(initialColumnData);
-    setCheckedItems(constant.ColumnNames.map(name => ({ label: name, checked: true })));
-  }
+    setInformation();
+    setShowTable(false);
+  };
 
   const handleCheckboxChange = index => {
-    setCheckedItems(items => items.map((it, i) => i === index ? { ...it, checked: !it.checked } : it));
-  };
-  
-  // Uncheck one when other side is checked
-  const handleOnlyMaxOrMin = (index, type) => {
-    setColumnData(prev => prev.map((item, i) => {
-      if (i === index) {
-        const otherType = type === 'onlyMin' ? 'onlyMax' : 'onlyMin';
-        if (!item[type]) {
-          setQueryConfig({ ...queryConfig, orderBy: '', orderFixed: true, limit: constant.LimitOptions[0] });
-          return { ...item, [type]: !item[type], [otherType]: false };
-        } else {
-          setQueryConfig({ ...queryConfig, orderFixed: false });
-          return { ...item, [type]: !item[type], [otherType]: false };
-        }
-      }
-      return { ...item, onlyMin: false, onlyMax: false };
+    setQueryConfig(prev => ({
+      ...prev,
+      columnData: prev.columnData.map((item, i) => 
+        i === index ? { ...item, checked: !item.checked } : item
+      )
     }));
+  };
+
+  // When user choose to query min or max value of data, automatically change other properly.
+  const handleOnlyMaxOrMin = (name, type) => {
+    setQueryConfig(prev => {
+      const updatedColumnData = prev.columnData.map((item, index) => {
+        if (item.name === name) {
+          const otherType = type === "onlyMin" ? "onlyMax" : "onlyMin";
+  
+          return {
+            ...item,
+            [type]: !item[type],
+            [otherType]: false,
+            checked: true,
+          };
+        }
+        return { ...item, onlyMin: false, onlyMax: false };
+      });
+  
+      const selectedColumn = updatedColumnData;
+  
+      return {
+        ...prev,
+        columnData: updatedColumnData,
+        ...(selectedColumn.onlyMin || selectedColumn.onlyMax
+          ? { orderBy: selectedColumn.name, orderFixed: true, limit: constant.LIMIT_OPTIONS[0] }
+          : { orderFixed: false }
+        )
+      };
+    });
   };
 
   const fetchItems = async () => {
@@ -78,38 +101,72 @@ function App() {
     setInformation('');
     
     const paramBuilder = new ParamBuilder();
-    if (queryConfig.limit === constant.ShowAll) { 
-      const explainParam = paramBuilder.buildExplainQuery(queryConfig, columnData);
+    if (queryConfig.limit === constant.SHOW_ALL) { 
+      const explainParam = paramBuilder.buildExplainQuery(queryConfig);
       try {
         const data = await fetchWeatherExplain(explainParam);
         const ret = data['count'] ?? 0;
-        console.log(data);
-        if (ret > 1000) {
-          setInformation(`한 번에 표시할 수 있는 데이터는 1000개입니다.\n예상되는 데이터 갯수는 ${ret}입니다.\n필터링을 추가해주세요`);
+        
+        if (ret > 1000000) {
+          setLoading(false);
+          setInformation(`조회된 데이터가 ${ret}개입니다. 조건을 추가해주세요.`);
           return;
-        } else {
-          setInformation(`데이터 갯수는 ${ret}입니다.`);
         }
-        console.log(`데이터 갯수는 ${ret}입니다.`);     
+        else
+           setInformation(`조회된 데이터는 ${ret}개입니다.`);
       } catch (error) {
         console.error("Fetching error!", error)
-        setInformation(`Fetching error! ${error.message}`);
+        setInformation(`에러가 발생하였습니다. ${error.message}`);
+        return;
       } finally {
-        //setLoading(false);
       }
     }
-    const param = paramBuilder.build(checkedLabels, queryConfig, columnData)
+    const param = paramBuilder.build(queryConfig)
+    console.log(param);
     try { 
       const data = await fetchWeatherItems(param);
+      if (!Array.isArray(data)) {
+        setLoading(false);
+        setInformation(`에러가 발생하였습니다. (예상치 못한 데이터 타입)`);
+        return;
+      }
       setSortedItems(
         data.map(item => checkedLabels.reduce((acc, col) => {
           acc[col] = item[col] ?? null;
           return acc;
         }, {}))
       );
+      setShowTable(true);
     } catch (error) {
       console.error("Fetching error!", error)
-      setInformation(`Fetching error! ${error.message}`);
+      setInformation(`에러가 발생하였습니다. ${error.message}`);
+      return;
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const fetchItems2 = async () => {
+    setLoading(true);
+    setInformation('');
+    try { 
+      const data = await fetchWeatherItems2(naturalQuery);
+      if (!Array.isArray(data)) {
+        setLoading(false);
+        setInformation(`에러가 발생하였습니다. (예상치 못한 데이터 타입)`);
+        return;
+      }
+      setSortedItems(
+        data.map(item => checkedLabels.reduce((acc, col) => {
+          acc[col] = item[col] ?? null;
+          return acc;
+        }, {}))
+      );
+      setShowTable(true);
+    } catch (error) {
+      console.error("Fetching error!", error)
+      setInformation(`에러가 발생하였습니다. ${error.message}`);
+      return;
     } finally {
       setLoading(false);
     }
@@ -140,24 +197,29 @@ function App() {
       <h1> Website to Search Weather</h1>
       <TableRegionSection queryConfig={queryConfig} setQueryConfig={setQueryConfig} />
       <QueryDataSection
-        columnData={columnData}
+        columnData={queryConfig.columnData}
+        setColumnData={(newData) => setQueryConfig(prev => ({ ...prev, columnData: newData }))}
         minMaxData={minMaxData}
         handleOnlyMaxOrMin={handleOnlyMaxOrMin}
-        setColumnData={setColumnData}
       />                                                        
       <OrderLimitSection queryConfig={queryConfig} setQueryConfig={setQueryConfig} />
       <SelectColumnsSection
-        checkedItems={checkedItems}
-        handleCheckboxChange={handleCheckboxChange}
+        columnData={queryConfig.columnData}
+        setData={handleCheckboxChange}
       />
-      <button onClick={clearConfig}>선택 초기화</button>
-      <button onClick={fetchItems} style={{ width: "300px", height: "40px", marginLeft: "300px" }}>검색</button>
+      <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "30px" }}>
+        <button onClick={clearConfig}>선택 초기화</button>
+      </div>
+      <div style={{ fontSize: "10px", whiteSpace: "pre-line", marginBottom: "10px"}}>
+        { naturalQuery }
+      </div>
+      <button onClick={fetchItems} style={{ width: "400px", height: "50px"}}>검색</button>
       {loading && <p>Loading...</p>}
       <div style={{ marginBottom: "10px"}}>
         { information }
       </div>
-      {!loading && sortedItems.length > 0 && (
-        <TableDisplay information={information} items={sortedItems} checkedLabels={checkedLabels} />
+      {!loading && sortedItems.length > 0 && showTable && (
+        <TableDisplay items={sortedItems} checkedLabels={checkedLabels} />
       )}
     </div>
   );

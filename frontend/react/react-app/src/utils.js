@@ -49,12 +49,6 @@ const languageMap = {
     'history': "과거 날씨",
   };
 
-  export const TableNames = [
-    'weather_data',
-    '미래 날씨',
-    '과거 날씨'
- ];
-
 export function translate(str) {
   return languageMap[str] || str;
 }

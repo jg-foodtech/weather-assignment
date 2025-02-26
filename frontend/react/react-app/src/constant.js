@@ -1,13 +1,14 @@
-export const ShowAll = '모두 보기';
+export const SHOW_ALL = '모두 보기';
+export const REGION_INDEX_LIMIT = 3;
 
 // FIXME: Get values from server
-export const TableNames = [
+export const TABLE_NAMES = [
     'weather_data',
     '미래 날씨',
     '과거 날씨'
  ];
 
-export const ColumnNames = [
+export const COLUMN_NAMES = [
     '도/특별시/광역시', 
     '시/군/구',
     '읍/면/동',
@@ -16,7 +17,7 @@ export const ColumnNames = [
     '적설량',
     '강수량' ];
 
-export const LimitOptions = [
+export const LIMIT_OPTIONS = [
     '1',
     '5',
     '10',
@@ -24,5 +25,5 @@ export const LimitOptions = [
     '30',
     '50',
     '100',
-    ShowAll,
+    SHOW_ALL,
 ];
