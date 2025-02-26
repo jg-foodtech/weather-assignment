@@ -3,7 +3,7 @@ import ParamBuilder from "./paramBuilder";
 import TableDisplay from './tableDisplay';
 import { fetchWeatherItems, fetchMinMaxData, fetchWeatherExplain, fetchWeatherItems2 } from './service';
 import { TableRegionSection, QueryDataSection, OrderLimitSection, SelectColumnsSection } from "./uiSection";
-import { generateNaturalLanguageQuery } from "./queryGenerator";
+import { generateNaturalLanguageQuery, generateNaturalLanguageQueryEng } from "./queryGenerator";
 import * as utils from './utils';
 import * as constant from "./constant";
 import './App.css';
@@ -40,7 +40,7 @@ function App() {
   }, [queryConfig.table]);
 
   useEffect(() => {
-    setNaturalQuery(generateNaturalLanguageQuery(queryConfig));
+    setNaturalQuery(generateNaturalLanguageQueryEng(queryConfig));
   }, [queryConfig]);
 
   // To adjust column order when showing query results
@@ -150,7 +150,7 @@ function App() {
     setLoading(true);
     setInformation('');
     try { 
-      const data = await fetchWeatherItems2(naturalQuery);
+      const data = await fetchWeatherItems2(`natural=${naturalQuery}`);        
       if (!Array.isArray(data)) {
         setLoading(false);
         setInformation(`에러가 발생하였습니다. (예상치 못한 데이터 타입)`);
@@ -207,13 +207,14 @@ function App() {
         columnData={queryConfig.columnData}
         setData={handleCheckboxChange}
       />
-      <div style={{ display: "flex", justifyContent: "flex-end", marginRight: "30px" }}>
+      <div style={{ display: "flex", justifyContent: "center", marginLeft: "550px", marginBottom: "10px" }}>
         <button onClick={clearConfig}>선택 초기화</button>
       </div>
       <div style={{ fontSize: "10px", whiteSpace: "pre-line", marginBottom: "10px"}}>
         { naturalQuery }
       </div>
       <button onClick={fetchItems} style={{ width: "400px", height: "50px"}}>검색</button>
+      <button onClick={fetchItems2} style={{ width: "400px", height: "50px"}}>검색(자연어)</button>
       {loading && <p>Loading...</p>}
       <div style={{ marginBottom: "10px"}}>
         { information }

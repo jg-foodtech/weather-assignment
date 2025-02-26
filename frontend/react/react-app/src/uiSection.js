@@ -133,7 +133,7 @@ export const QueryDataSection = ({ columnData, setColumnData, minMaxData, handle
 
 export const SelectColumnsSection = ({ columnData, setData }) => {
   return (
-    <form style={{ display: 'flex', justifyContent: 'center', marginBottom: "20px" }}>
+    <form style={{ display: 'flex', justifyContent: 'center', marginBottom: "10px" }}>
     {columnData.map((item, index) => (
       <CheckboxWithIndex
         key={index}

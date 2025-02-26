@@ -24,9 +24,11 @@ export const fetchWeatherItems = async (params) => {
   const response = await axios.get(`${getApiUrl()}/api/weather/items?${params}`);
   return response.data;
 };
-
+// POST To avoid string limitation
 export const fetchWeatherItems2 = async (params) => {
-  const response = await axios.get(`${getApiUrl()}/api/weather/natural?${params}`);
+  const response = await axios.post(`${getApiUrl()}/api/weather/natural`, { query: params }, {
+    headers: { "Content-Type": "application/json" }
+  });
   return response.data;
 };
 

@@ -1,6 +1,7 @@
 import pymysql
 import re
 import logging
+from logger import logger
 
 class QueryBuilder:
     def __init__(self, table):
@@ -55,10 +56,14 @@ class QueryBuilder:
         
         with open("output2.txt", "w") as file:
              file.write(sql)
+        logger.debug(sql)
         return sql
     
-    def explain(self):
-        sql = f"SELECT COUNT(*) FROM {self.table}"
+    def count(self):
+        select = "*"
+        if self.distinct:
+            select = f"DISTINCT {self.columns}"
+        sql = f"SELECT COUNT({select}) FROM {self.table}"
 
         if self.conditions:
             sql += " WHERE " + " AND ".join(self.conditions)
@@ -71,24 +76,25 @@ class QueryBuilder:
 
 class DatabaseManager:
     # FIXME: Group arguments. Is it write to get table in constructor?
-    def __init__(self):
+    def __init__(self, name):
         self.conn = pymysql.connect(host="127.0.0.1", 
      		        			    user="jingi", 
                                     passwd="123",
                                     db="weather_db") # FIXME
         self.query = None
-        self.queryBuilder = None    
+        self.queryBuilder = None
+        self.table = name
         self.cursor = self.conn.cursor()
         
-    def get_columns(self, table):
+    def get_columns(self):
         self.queryBuilder.build()
-        data = self.cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {table}")
+        data = self.cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {self.table}")
         data = self.cursor.fetchall()
         self.cursor.close()
         return data;
 
-    def prepare(self, table, distinct, columns, wheres, order_by, desc, limit):
-        self.queryBuilder = QueryBuilder(table)
+    def prepare(self, distinct, columns, wheres, order_by, desc, limit):
+        self.queryBuilder = QueryBuilder(self.table)
         if columns:
             logging.debug("debug loggg = %s", columns)
             self.queryBuilder.select(*columns.split(","), distinct=distinct)
@@ -103,12 +109,16 @@ class DatabaseManager:
             self.queryBuilder.limit_results(limit)
 
         self.set_query(self.queryBuilder.build())
+        with open("output2.txt", "w") as file:
+            file.write(self.query)
 
-    def explain(self, table, wheres):
-        self.queryBuilder = QueryBuilder(table)
+    def count(self, distinct, columns, wheres):
+        self.queryBuilder = QueryBuilder(self.table)
+        if columns:
+            self.queryBuilder.select(*columns.split(","), distinct=distinct)
         for condition in wheres:
             self.queryBuilder.where(condition)
-        self.set_query(self.queryBuilder.explain())
+        self.set_query(self.queryBuilder.count())
 
     def set_query(self, query):
         self.query = query
