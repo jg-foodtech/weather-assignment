@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import * as utils from "./utils";
+import * as utils from "../utils/utils";
 
 const TableDisplay = ({ items, checkedLabels }) => {
   const itemsPerPage = 30;

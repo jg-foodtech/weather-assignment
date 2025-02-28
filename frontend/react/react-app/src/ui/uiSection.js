@@ -1,8 +1,8 @@
 // src/components/QuerySection.js
 import React from 'react';
-import { Combobox, Checkbox, TwoEntryCheckbox, CheckboxWithIndex } from './combobox';
-import * as constant from "./constant";
-import * as utils from './utils';
+import { Combobox, Checkbox, TwoEntryCheckbox, CheckboxWithIndex } from '../components/combobox';
+import * as constant from "../constants/constant";
+import * as utils from '../utils/utils';
 
 export const TableRegionSection = ({ queryConfig, setQueryConfig }) => {
   return (

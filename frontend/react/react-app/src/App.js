@@ -1,11 +1,11 @@
 import React, { useState, useMemo, useEffect  } from 'react';
-import ParamBuilder from "./paramBuilder";
-import TableDisplay from './tableDisplay';
-import { fetchWeatherItems, fetchMinMaxData, fetchWeatherExplain, fetchWeatherItems2 } from './service';
-import { TableRegionSection, QueryDataSection, OrderLimitSection, SelectColumnsSection } from "./uiSection";
-import { generateNaturalLanguageQuery, generateNaturalLanguageQueryEng } from "./queryGenerator";
-import * as utils from './utils';
-import * as constant from "./constant";
+
+import { TableRegionSection, QueryDataSection, OrderLimitSection, SelectColumnsSection } from "./ui/uiSection";
+import TableDisplay from './ui/tableDisplay';
+import { generateNaturalLanguageQuery, generateNaturalLanguageQueryEng } from "./query/queryGenerator";
+import { fetchItems, fetchItemNatural, fetchInitialData } from './services/fetchService';
+import * as utils from './utils/utils';
+import * as constant from "./constants/constant";
 import './App.css';
 
 const initialQueryConfig = {
@@ -27,29 +27,46 @@ const initialQueryConfig = {
 };
 
 function App() {
-  const [sortedItems, setSortedItems] = useState([]); // Object is not ordered by select order
-  const [loading, setLoading] = useState(false);
-  const [minMaxData, setMinMaxData] = useState({});
-  const [queryConfig, setQueryConfig] = useState(initialQueryConfig);
-  const [naturalQuery, setNaturalQuery] = useState("");
-  const [information, setInformation] = useState("");
-  const [showTable, setShowTable] = useState(false);
+  const [sortedItems, setSortedItems] = useState([]); // Stores sorted query results
+  const [loading, setLoading] = useState(false);  // Stores loading state
+  const [minMaxData, setMinMaxData] = useState({}); // Stores min/max values for each column
+  const [queryConfig, setQueryConfig] = useState(initialQueryConfig); // Stores query config
+  const [naturalQuery, setNaturalQuery] = useState(""); // Stores natural laungage from selected buttons
+  const [information, setInformation] = useState(""); // Stores user messages
+  const [showTable, setShowTable] = useState(false); // Controls table visibility
 
-  useEffect(() => {
-    fetchData();
-  }, [queryConfig.table]);
-
-  useEffect(() => {
-    setNaturalQuery(generateNaturalLanguageQueryEng(queryConfig));
-  }, [queryConfig]);
-
-  // To adjust column order when showing query results
+  // Memoized checked column labels
   const checkedLabels = useMemo(
     () => queryConfig.columnData
       .filter(item => item.checked)
       .map(item => utils.translate(item.name)),
     [queryConfig.columnData]
   );
+
+  const state = {
+    queryConfig,
+    naturalQuery,
+    checkedLabels,
+    setLoading,
+    setInformation,
+    setSortedItems,
+    setShowTable,
+    setMinMaxData
+  };
+  
+  const handleFetchItems = () => fetchItems(state);
+  const handleFetchItemNatural = () => fetchItemNatural(state);
+
+  // Fetch min/max data when table changes
+  useEffect(() => {
+    fetchInitialData(state);
+  }, [queryConfig.table]);
+
+  // Update natural language query when query configuration changes
+  useEffect(() => {
+    setNaturalQuery(generateNaturalLanguageQueryEng(queryConfig));
+  }, [queryConfig]);
+
 
   const clearConfig = () => { 
     setQueryConfig(initialQueryConfig);
@@ -66,7 +83,7 @@ function App() {
     }));
   };
 
-  // When user choose to query min or max value of data, automatically change other properly.
+  // Adjust query configuration when min/max selection is changed
   const handleOnlyMaxOrMin = (name, type) => {
     setQueryConfig(prev => {
       const updatedColumnData = prev.columnData.map((item, index) => {
@@ -96,102 +113,6 @@ function App() {
     });
   };
 
-  const fetchItems = async () => {
-    setLoading(true);
-    setInformation('');
-    
-    const paramBuilder = new ParamBuilder();
-    if (queryConfig.limit === constant.SHOW_ALL) { 
-      const explainParam = paramBuilder.buildExplainQuery(queryConfig);
-      try {
-        const data = await fetchWeatherExplain(explainParam);
-        const ret = data['count'] ?? 0;
-        
-        if (ret > 1000000) {
-          setLoading(false);
-          setInformation(`조회된 데이터가 ${ret}개입니다. 조건을 추가해주세요.`);
-          return;
-        }
-        else
-           setInformation(`조회된 데이터는 ${ret}개입니다.`);
-      } catch (error) {
-        console.error("Fetching error!", error)
-        setInformation(`에러가 발생하였습니다. ${error.message}`);
-        return;
-      } finally {
-      }
-    }
-    const param = paramBuilder.build(queryConfig)
-    console.log(param);
-    try { 
-      const data = await fetchWeatherItems(param);
-      if (!Array.isArray(data)) {
-        setLoading(false);
-        setInformation(`에러가 발생하였습니다. (예상치 못한 데이터 타입)`);
-        return;
-      }
-      setSortedItems(
-        data.map(item => checkedLabels.reduce((acc, col) => {
-          acc[col] = item[col] ?? null;
-          return acc;
-        }, {}))
-      );
-      setShowTable(true);
-    } catch (error) {
-      console.error("Fetching error!", error)
-      setInformation(`에러가 발생하였습니다. ${error.message}`);
-      return;
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchItems2 = async () => {
-    setLoading(true);
-    setInformation('');
-    try { 
-      const data = await fetchWeatherItems2(`natural=${naturalQuery}`);        
-      if (!Array.isArray(data)) {
-        setLoading(false);
-        setInformation(`에러가 발생하였습니다. (예상치 못한 데이터 타입)`);
-        return;
-      }
-      setSortedItems(
-        data.map(item => checkedLabels.reduce((acc, col) => {
-          acc[col] = item[col] ?? null;
-          return acc;
-        }, {}))
-      );
-      setShowTable(true);
-    } catch (error) {
-      console.error("Fetching error!", error)
-      setInformation(`에러가 발생하였습니다. ${error.message}`);
-      return;
-    } finally {
-      setLoading(false);
-    }
-  };
-   
-  const fetchData = async () => {
-    try {
-      if (!queryConfig.table)
-        return;
-      const data = await fetchMinMaxData(`from=${utils.translate(queryConfig.table)}`);
-      const formated = Object.keys(data).reduce((acc, column) => {
-        const columnData = data[column];
-          if (column === 'datetime') {
-            columnData.min = utils.formatDate2(columnData.min);
-            columnData.max = utils.formatDate2(columnData.max);
-          }
-        acc[column] = columnData;
-        return acc;
-      }, {});
-      setMinMaxData(formated);
-    } catch (error) {
-      console.error('Error fetching data:', error);
-    }
-  };
-
   return (
     <div className="App">
       <h1> Website to Search Weather</h1>
@@ -213,8 +134,8 @@ function App() {
       <div style={{ fontSize: "10px", whiteSpace: "pre-line", marginBottom: "10px"}}>
         { naturalQuery }
       </div>
-      <button onClick={fetchItems} style={{ width: "400px", height: "50px"}}>검색</button>
-      <button onClick={fetchItems2} style={{ width: "400px", height: "50px"}}>검색(자연어)</button>
+      <button onClick={handleFetchItems} style={{ width: "400px", height: "50px"}}>검색</button>
+      <button onClick={handleFetchItemNatural} style={{ width: "400px", height: "50px"}}>검색(자연어)</button>
       {loading && <p>Loading...</p>}
       <div style={{ marginBottom: "10px"}}>
         { information }

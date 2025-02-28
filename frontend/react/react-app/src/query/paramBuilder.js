@@ -1,5 +1,5 @@
-import * as utils from './utils';
-import * as constant from './constant';
+import * as utils from '../utils/utils';
+import * as constant from '../constants/constant';
 
 class ParamBuilder {
     constructor() {
@@ -87,7 +87,7 @@ class ParamBuilder {
       return this.params.join('&');
     }
 
-    buildExplainQuery(queryConfig) {
+    buildCountQuery(queryConfig) {
       const selectedColumns = queryConfig.columnData
       .filter(item => item.checked)
       .map(item => utils.translate(item.name));

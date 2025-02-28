@@ -1,4 +1,4 @@
-import { data } from './distinct';
+import { data } from '../constants/distinct';
 
 export function getFirstElements() {
     const firstElements = data.map(row => row[0]);

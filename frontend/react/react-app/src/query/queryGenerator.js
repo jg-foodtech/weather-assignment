@@ -1,6 +1,9 @@
-import * as constant from "./constant";
-import * as utils from "./utils";
+import * as constant from "../constants/constant";
+import * as utils from "../utils/utils";
 
+/**
+ *  To display Korean, make string based on queryConfig
+ */
 export const generateNaturalLanguageQuery = (queryConfig) => {
   const selectedColumns = queryConfig.columnData
     .filter(item => item.checked)
@@ -59,14 +62,16 @@ export const generateNaturalLanguageQuery = (queryConfig) => {
   return queryText;
 };
 
-
+/**
+ *  To send natural language as a param, translate to English with queryConfig
+ */
 export const generateNaturalLanguageQueryEng = (queryConfig) => {
   const selectedColumns = queryConfig.columnData
     .filter(item => item.checked)
     .map(item => utils.translate(item.name))
     .join(", ");
   
-  let queryText = `${queryConfig.table} 테이블에서 ${selectedColumns} 정보를 조회합니다.\n`;
+  let queryText = `${utils.translate(queryConfig.table)} 테이블에서 ${selectedColumns} 정보를 조회합니다.\n`;
 
   const regions = queryConfig.columnData
   .filter(column => !column.rangable && column.region)

@@ -1,9 +1,9 @@
 export const SHOW_ALL = '모두 보기';
 export const REGION_INDEX_LIMIT = 3;
+export const MAX_RESULT_NUM = 100000;
 
 // FIXME: Get values from server
 export const TABLE_NAMES = [
-    'weather_data',
     '미래 날씨',
     '과거 날씨'
  ];
