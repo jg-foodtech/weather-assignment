@@ -1,9 +1,11 @@
 import pymysql
 import re
-import logging
 from logger import logger
+from exceptions import InvalidQueryError
 
 class QueryBuilder:
+    """Class to build query from data that comes from user"""
+
     def __init__(self, table):
         self.table = table
         self.columns = "*"
@@ -27,9 +29,8 @@ class QueryBuilder:
         
         if not isinstance(value, (int, float, bool)):
             value = value if isinstance(value, str) and value.isdigit() else f"'{value}'"
-        ret = f"{column} {operator} {value}"
-        
-        self.conditions.append(ret)
+
+        self.conditions.append(f"{column} {operator} {value}")
         return self
 
     def order(self, column, desc=False):
@@ -54,49 +55,91 @@ class QueryBuilder:
         if self.limit:
             sql += f" LIMIT {self.limit}"
         
-        with open("output2.txt", "w") as file:
-             file.write(sql)
         logger.debug(sql)
         return sql
     
     def count(self):
-        select = "*"
-        if self.distinct:
-            select = f"DISTINCT {self.columns}"
+        select = "DISTINCT " + self.columns if self.distinct else "*"
         sql = f"SELECT COUNT({select}) FROM {self.table}"
 
         if self.conditions:
             sql += " WHERE " + " AND ".join(self.conditions)
 
-        logging.debug(sql)
+        logger.debug(sql)
         return sql
     
     def clear(self):
         return
 
 class DatabaseManager:
-    # FIXME: Group arguments. Is it write to get table in constructor?
-    def __init__(self, name):
+    """Manager class who executes query and return the results"""
+
+    def __init__(self, table):
         self.conn = pymysql.connect(host="127.0.0.1", 
      		        			    user="jingi", 
                                     passwd="123",
-                                    db="weather_db") # FIXME
+                                    db="weather_db")
         self.query = None
         self.queryBuilder = None
-        self.table = name
+        self.table = table
         self.cursor = self.conn.cursor()
+        self.minmax_cache = None
+        self.set_minmax()
+
+    def set_minmax(self):
+        """Save cache of min, max, column values"""
+        if self.minmax_cache is not None:
+            return
         
+        self.set_query(
+            f"SELECT COLUMN_NAME, DATA_TYPE, IS_NULLABLE "
+            f"FROM INFORMATION_SCHEMA.COLUMNS "
+            f"WHERE TABLE_NAME='{self.table}'"
+        )
+        columns = self.fetch_all()
+        minmax_data = {}
+        
+        for column in columns:
+            column_name = column[0]
+            data_type = column[1]
+            is_nullable = column[2]
+            self.set_query(
+                f"SELECT MIN({column_name}) AS min, MAX({column_name}) "
+                f"AS max FROM {self.table}")
+            data = self.fetch_one()
+            min_val, max_val = data
+            minmax_data[column_name] = {
+                'min': min_val,
+                'max': max_val,
+                'data_type': data_type,
+                'is_nullable': is_nullable
+            }
+        self.minmax_cache = minmax_data
+
+    def get_minmax(self):
+        return self.minmax_cache
+
     def get_columns(self):
         self.queryBuilder.build()
-        data = self.cursor.execute(f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS WHERE TABLE_NAME = {self.table}")
+        data = self.cursor.execute(
+            f"SELECT COLUMN_NAME FROM INFORMATION_SCHEMA.COLUMNS "
+            f"WHERE TABLE_NAME = {self.table}")
         data = self.cursor.fetchall()
         self.cursor.close()
-        return data;
+        return data
+            
+    def set_query(self, query):
+        self.query = query
+        try:
+            self.cursor.execute(f"EXPLAIN {self.query}")
+        except pymysql.MySQLError as e:
+            logger.error(f"Invalid query: {e}")
+            raise InvalidQueryError(f"Query query: {str(e)}")
 
     def prepare(self, distinct, columns, wheres, order_by, desc, limit):
+        """Prepare sql query before requesting to database"""
         self.queryBuilder = QueryBuilder(self.table)
         if columns:
-            logging.debug("debug loggg = %s", columns)
             self.queryBuilder.select(*columns.split(","), distinct=distinct)
         
         for condition in wheres:
@@ -108,37 +151,27 @@ class DatabaseManager:
         if limit:
             self.queryBuilder.limit_results(limit)
 
-        self.set_query(self.queryBuilder.build())
-        with open("output2.txt", "w") as file:
-            file.write(self.query)
+        sql = self.queryBuilder.build()
+        self.set_query(sql)
 
     def count(self, distinct, columns, wheres):
+        """Prepare sql query for counting result before requesting to database"""
         self.queryBuilder = QueryBuilder(self.table)
         if columns:
             self.queryBuilder.select(*columns.split(","), distinct=distinct)
         for condition in wheres:
             self.queryBuilder.where(condition)
-        self.set_query(self.queryBuilder.count())
 
-    def set_query(self, query):
-        self.query = query
+        sql = self.queryBuilder.count()
+        self.set_query(sql)
 
     def fetch_all(self):
         self.cursor.execute(self.query)
-        data = self.cursor.fetchall()
-        return data
+        return self.cursor.fetchall()
     
     def fetch_one(self):
-        cursor = self.cursor
-        cursor.execute(self.query)
-        data = cursor.fetchone()
-
-        data_str = "\n".join([str(row) for row in data])
-        with open("output2.txt", "a") as file:
-            file.write(data_str + "\n")
-        return data
+        self.cursor.execute(self.query)
+        return self.cursor.fetchone()
     
     def clear(self):
         self.queryBuilder = None
-        self.cursor.close()
-        return

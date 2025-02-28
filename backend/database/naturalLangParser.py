@@ -5,7 +5,7 @@ from logger import logger
 nlp = spacy.load("ko_core_news_sm")
 
 DB_COLUMNS = ["temperature", "precipitation", "snowfall", "datetime", "sigungu", "sido", "dong"]
-TABLE_NAMES = ["weather_data", "forecast", "history"]
+TABLE_NAMES = ["forecast", "history"]
 REGION_NAMES = ["sigungu", "sido", "dong"]
 BIGGER = [ "크", "초과", "큰", "이후", "커", "높" , "큽", "많"]
 SMALLER = ["미만", "작", "이전", "낮", "적"]
@@ -38,8 +38,9 @@ SQL_KEYWORDS = set(DB_COLUMNS + TABLE_NAMES +
                    sum(ORDER_BY_KEYWORDS.values(), []) +
                    LIMIT_KEYWORDS)
 
-
 class NaturalLangParser:
+    """Class to Build query from parsing natural language"""
+
     def __init__(self, naturalQuery):
         self.table = None
         self.distinct = False
@@ -52,7 +53,8 @@ class NaturalLangParser:
         self.doc = nlp(naturalQuery)
         self.tokens = self.clean_tokens([token.text for token in self.doc])
 
-    def clean_tokens(self, tokens):
+    def clean_tokens(self, tokens)  -> list[str]:
+        """Tokenize for parsing"""
         cleaned_tokens = []
         for i in range(len(tokens)):
             token = tokens[i]
@@ -79,8 +81,57 @@ class NaturalLangParser:
                         cleaned_tokens.append(''.join(match))
 
         return cleaned_tokens
+    
+    def parse(self) -> dict:
+        """Parse tokens to compose query"""
+        index = 0
+        while index < len(self.tokens):
+            token = self.tokens[index]
 
-    def parse_where(self, index):
+            if token in TABLE_KEYWORDS: # table (From)
+                index = self.parse_table(index)
+            elif token in DB_COLUMNS: # select or where parsing (temp가 3 이상, 5 이하)
+                index = self.parse_where(index)
+            elif any(token in values for values in ORDER_BY_KEYWORDS.values()): # orderby
+                desc = next((key for key, values in ORDER_BY_KEYWORDS.items() if token in values), None)
+                index = self.parse_orderby(index, desc)
+            elif any(token in values for values in TOP_KEYWORDS.values()): # orderby (best, worst case)
+                desc = next((key for key, values in TOP_KEYWORDS.items() if token in values), None)
+                index = self.parse_orderby(index, desc)
+                self.limit = 1
+            elif token in PRIORITY_SUB_KEYWORDS: # Find highest, lowest
+                if self.tokens[index + 1] in BIGGER:
+                    index = self.parse_orderby(index + 1, 'DESC')
+                elif self.tokens[index + 1] in SMALLER:
+                    index = self.parse_orderby(index + 1, 'ASC')
+                else:
+                    self.order_by = {"column": self.latest_column, "order": desc}
+                    self.limit = 1
+                self.used_tokens.update(token)
+            elif token in LIMIT_KEYWORDS: #limit
+                if index > 0 and self.tokens[index - 1].isdigit():
+                    self.limit = int(self.tokens[index - 1])
+                    self.used_tokens.update([self.tokens[index - 1], token])
+            elif token in DISTINCT_KEYWORDS:
+                self.distinct = True
+
+            index += 1
+
+        unprocessed_tokens = [token for token in self.tokens if token not in self.used_tokens]
+
+        return {
+            "columns": ",".join(self.unhandled) or ["*"],
+            "distinct": self.distinct,
+            "table": self.table,
+            "conditions": [f"{col}{op}{val}" for col, op, val in self.conditions],
+            "order_by": self.order_by["column"] if self.order_by else None,
+            "desc": self.order_by["order"] == "DESC" if self.order_by else False,
+            "limit": self.limit,
+            "unprocessed_tokens": unprocessed_tokens
+        }
+    
+    def parse_where(self, index) -> int:
+        """Parse tokens to get where conditions in query"""
         token =self.tokens[index]
         col_name = token
         self.latest_column = col_name
@@ -131,7 +182,8 @@ class NaturalLangParser:
         return index
     
 
-    def parse_table(self, index):
+    def parse_table(self, index) -> int:
+        """Parse table to get from condition in query"""
         token = self.tokens[index]
         if index > 0 and self.tokens[index - 1] in TABLE_NAMES:
             self.table = self.tokens[index - 1]
@@ -141,7 +193,8 @@ class NaturalLangParser:
             self.used_tokens.update([self.table, token])
         return index
     
-    def parse_orderby(self, index, desc):
+    def parse_orderby(self, index, desc) -> int:
+        """Parse orderby to get orderby condition in query"""
         token = self.tokens[index]
         if index + 1 < len(self.tokens) and self.tokens[index + 1] in DB_COLUMNS:
             self.order_by = {"column": self.tokens[index + 1], "order": desc}
@@ -155,50 +208,3 @@ class NaturalLangParser:
             self.order_by = {"column": self.latest_column, "order": desc}
             self.used_tokens.update(token)
         return index
-    
-    def parse(self):
-        index = 0
-        while index < len(self.tokens):
-            token = self.tokens[index]
-
-            if token in TABLE_KEYWORDS: # table (From)
-                index = self.parse_table(index)
-            elif token in DB_COLUMNS: # select or where parsing (temp가 3 이상, 5 이하)
-                index = self.parse_where(index)
-            elif any(token in values for values in ORDER_BY_KEYWORDS.values()): # orderby
-                desc = next((key for key, values in ORDER_BY_KEYWORDS.items() if token in values), None)
-                index = self.parse_orderby(index, desc)
-            elif any(token in values for values in TOP_KEYWORDS.values()): # orderby (best, worst case)
-                desc = next((key for key, values in TOP_KEYWORDS.items() if token in values), None)
-                index = self.parse_orderby(index, desc)
-                self.limit = 1
-            elif token in PRIORITY_SUB_KEYWORDS: # Find highest, lowest
-                if self.tokens[index + 1] in BIGGER:
-                    index = self.parse_orderby(index + 1, 'DESC')
-                elif self.tokens[index + 1] in SMALLER:
-                    index = self.parse_orderby(index + 1, 'ASC')
-                else:
-                    self.order_by = {"column": self.latest_column, "order": desc}
-                    self.limit = 1
-                self.used_tokens.update(token)
-            elif token in LIMIT_KEYWORDS: #limit
-                if index > 0 and self.tokens[index - 1].isdigit():
-                    self.limit = int(self.tokens[index - 1])
-                    self.used_tokens.update([self.tokens[index - 1], token])
-            elif token in DISTINCT_KEYWORDS:
-                self.distinct = True
-
-            index += 1
-
-        unprocessed_tokens = [token for token in self.tokens if token not in self.used_tokens]
-
-        return {
-            "columns": ",".join(self.unhandled) or ["*"],
-            "distinct": self.distinct,
-            "table": self.table,
-            "conditions": [f"{col}{op}{val}" for col, op, val in self.conditions],
-            "order_by": self.order_by["column"] if self.order_by else None,
-            "desc": self.order_by["order"] == "DESC" if self.order_by else False,
-            "limit": self.limit,
-            "unprocessed_tokens": unprocessed_tokens
-        }
